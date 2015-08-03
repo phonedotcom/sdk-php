@@ -14,14 +14,12 @@ class Processor
         return $results;
     }
 
-    /*
-    public function processInsertGetId(Builder $query, $sql, $values, $sequence = null)
+    public function processInsertGetId(Builder $query, $url, $options, $values, $sequence = null)
     {
-        $query->getConnection()->insert($sql, $values);
+        $item = $query->getConnection()->insert($url, $options);
 
-        $id = $query->getConnection()->getPdo()->lastInsertId($sequence);
+        $id = $item->{$sequence};
 
         return is_numeric($id) ? (int) $id : $id;
     }
-    */
 }

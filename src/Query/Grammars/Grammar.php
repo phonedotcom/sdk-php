@@ -27,18 +27,4 @@ class Grammar extends BaseGrammar
     {
         return $this->compileInsert($query, $values);
     }
-
-    /**
-     * Compile a truncate table statement into SQL.
-     *
-     * @param  \PhoneCom\Sdk\Query\Builder  $query
-     * @return array
-     */
-    public function compileTruncate(Builder $query)
-    {
-        // TODO: Implement this!!!
-        throw new \Exception(__METHOD__ . ' not implemented yet');
-
-        return ['truncate '.$this->wrapTable($query->from) => []];
-    }
 }
