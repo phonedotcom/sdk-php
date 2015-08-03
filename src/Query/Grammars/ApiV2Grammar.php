@@ -53,6 +53,14 @@ class ApiV2Grammar extends Grammar
     }
 
     /**
+     * Compile an insert and get ID statement into SQL.
+     */
+    public function compileInsertGetId(Builder $query, $values, $sequence)
+    {
+        return $this->compileInsert($query, $values);
+    }
+
+    /**
      * Compile the "where" portions of the query.
      *
      * @param  \PhoneCom\Sdk\Query\Builder  $query
@@ -66,7 +74,6 @@ class ApiV2Grammar extends Grammar
             $params['filter'] = [];
 
             foreach ($query->wheres as $where) {
-
                 $string = $where['operator'];
 
                 $value = $where['value'];
@@ -124,12 +131,6 @@ class ApiV2Grammar extends Grammar
 
         return $params;
     }
-
-
-
-
-
-
 
     /**
      * Compile an update statement into SQL.

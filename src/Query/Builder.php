@@ -367,14 +367,9 @@ class Builder
      */
     public function insertGetId(array $values, $sequence = null)
     {
-        // TODO: Implement this!!!
-        throw new \Exception(__METHOD__ . ' not implemented yet');
+        list($url, $options) = $this->grammar->compileInsertGetId($this, $values, $sequence);
 
-        $sql = $this->grammar->compileInsertGetId($this, $values, $sequence);
-
-        $values = $this->cleanBindings($values);
-
-        return $this->processor->processInsertGetId($this, $sql, $values, $sequence);
+        return $this->processor->processInsertGetId($this, $url, $options, $values, $sequence);
     }
 
     /**
@@ -387,7 +382,7 @@ class Builder
     {
         $chunkSize = 50;
 
-        $this->chunk($chunkSize, function($rows) use ($values) {
+        $this->chunk($chunkSize, function ($rows) use ($values) {
             foreach ($rows as $existing) {
                 list($url, $options) = $this->grammar->compileUpdate($this, $existing, $values);
                 $this->connection->update($url, $options);
@@ -411,7 +406,7 @@ class Builder
 
         $chunkSize = 50;
 
-        $this->chunk($chunkSize, function($rows) {
+        $this->chunk($chunkSize, function ($rows) {
             foreach ($rows as $existing) {
                 list($url, $options) = $this->grammar->compileDelete($this, $existing);
                 $this->connection->delete($url, $options);
@@ -428,17 +423,17 @@ class Builder
      */
     public function newQuery()
     {
-        return new static($this->client, $this->grammar, $this->processor);
+        return new static($this->connection, $this->grammar, $this->processor);
     }
 
     /**
      * Get the database connection instance.
      *
-     * @return ClientInterface
+     * @return ConnectionInterface
      */
-    public function getClient()
+    public function getConnection()
     {
-        return $this->client;
+        return $this->connection;
     }
 
     /**
@@ -500,7 +495,4 @@ class Builder
         }
     }
 */
-
-
-
 }

@@ -2,7 +2,6 @@
 
 namespace PhoneCom\Sdk\Eloquent;
 
-use DateTime;
 use Exception;
 use ArrayAccess;
 use JsonSerializable;
@@ -99,20 +98,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var array
      */
     protected $guarded = ['*'];
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
-    protected $dates = [];
-
-    /**
-     * The storage format of the model's date columns.
-     *
-     * @var string
-     */
-    protected $dateFormat;
 
     /**
      * The attributes that should be casted to native types.
@@ -320,7 +305,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $totallyGuarded = $this->totallyGuarded();
 
         foreach ($this->fillableFromArray($attributes) as $key => $value) {
-
             // The developers may choose to place some attributes in the "fillable"
             // array, which means only those attributes may be set through mass
             // assignment to the model, and all others will just be ignored.
@@ -398,11 +382,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     // TODO: Do this recursively in case we have child objects.  Actually, maybe we can detect any sub-objects
     // TODO: and wrap them in a Model object.... better yet, do something like:
     // TODO:     $this->addRelation($key, new Model($subObject));
-
-    protected $masonControls;
-    protected $masonMeta;
-    protected $masonNamespaces;
-    protected $masonError;
 
     public function newFromBuilder($attributes = [], $connection = null)
     {
@@ -982,9 +961,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
             $saved = $this->performUpdate($query, $options);
-        }
-
-        // If the model is brand new, we'll insert it into our database and set the
+        } // If the model is brand new, we'll insert it into our database and set the
         // ID attribute on the model to the value of the newly inserted row's ID
         // which is typically an auto-increment value managed by the database.
         else {
@@ -1065,9 +1042,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if ($this->incrementing) {
             $this->insertAndSetId($query, $attributes);
-        }
-
-        // If the table is not incrementing we'll simply insert this attributes as they
+        } // If the table is not incrementing we'll simply insert this attributes as they
         // are, as this attributes arrays must contain an "id" column already placed
         // there by the developer as the manually determined key for these models.
         else {
@@ -1664,7 +1639,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             }
 
             $attributes[$key] = $this->mutateAttributeForArray(
-                $key, $attributes[$key]
+                $key,
+                $attributes[$key]
             );
         }
 
@@ -1678,7 +1654,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             }
 
             $attributes[$key] = $this->castAttribute(
-                $key, $attributes[$key]
+                $key,
+                $attributes[$key]
             );
         }
 
@@ -1770,15 +1747,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $value = $this->castAttribute($key, $value);
         }
 
-        // If the attribute is listed as a date, we will convert it to a DateTime
-        // instance on retrieval, which makes it quite convenient to work with
-        // date fields without having to create a mutator for each property.
-        elseif (in_array($key, $this->getDates())) {
-            if (!is_null($value)) {
-                return $this->asDateTime($value);
-            }
-        }
-
         return $value;
     }
 
@@ -1853,7 +1821,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if ($this->hasCast($key)) {
             return in_array(
-                $this->getCastType($key), ['array', 'json', 'object', 'collection'], true
+                $this->getCastType($key),
+                ['array', 'json', 'object', 'collection'],
+                true
             );
         }
 
@@ -1927,13 +1897,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->{$method}($value);
         }
 
-        // If an attribute is listed as a "date", we'll convert it from a DateTime
-        // instance into a form proper for storage on the database tables using
-        // the connection grammar's date format. We will auto set the values.
-        elseif (in_array($key, $this->getDates()) && $value) {
-            $value = $this->fromDateTime($value);
-        }
-
         if ($this->isJsonCastable($key)) {
             $value = json_encode($value);
         }
@@ -1950,33 +1913,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function hasSetMutator($key)
     {
         return method_exists($this, 'set'.Str::studly($key).'Attribute');
-    }
-
-    /**
-     * Get the attributes that should be converted to dates.
-     *
-     * @return array
-     */
-    public function getDates()
-    {
-        $defaults = [static::CREATED_AT, static::UPDATED_AT];
-
-        return array_merge($this->dates, $defaults);
-    }
-
-    /**
-     * Convert a DateTime to a storable string.
-     *
-     * @param  \DateTime|int  $value
-     * @return string
-     */
-    public function fromDateTime($value)
-    {
-        $format = $this->getDateFormat();
-
-        $value = $this->asDateTime($value);
-
-        return $value->format($format);
     }
 
     /**
