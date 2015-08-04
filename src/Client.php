@@ -1,15 +1,16 @@
 <?php namespace PhoneCom\Sdk;
 
-use Doctrine\Common\Cache\RedisCache;
+use Illuminate\Support\Str;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Exception\ClientException;
-use Kevinrob\GuzzleCache\CacheMiddleware;
-use Kevinrob\GuzzleCache\PrivateCache;
 use PhoneCom\Sdk\Models\QueryBuilder;
+use PhoneCom\Sdk\Models\QueryException;
 
 class Client
 {
+    private $guzzleClient;
+
     protected $baseUrl = 'https://v2.api.phone.com';
     protected $headers = [];
 
@@ -117,19 +118,14 @@ class Client
     protected function run($verb, $url, $options = [])
     {
         try {
-            $stack = HandlerStack::create();
-            $stack->push(new CacheMiddleware(new PrivateCache(new RedisCache)), 'cache');
+            $response = $this->getGuzzleClient()->request($verb, $url, $options);
 
-            $client = new Guzzle([
-                'handler' => $stack,
-                'base_uri' => $this->baseUrl,
-                'headers' => $this->headers
-            ]);
-
-            $response = $client->request($verb, $url, $options);
-
-            if ($response->getHeaderLine('Content-Type') != 'application/vnd.mason+json') {
-                throw new \Exception('API response is not a Mason document');
+            if ($response->getHeaderLine('X-KevinRob-Cache') != 'HIT'
+                && $response->getHeaderLine('Content-Type') != 'application/vnd.mason+json'
+            ) {
+                throw new \Exception(
+                    'API response is not a Mason document: ' . Str::limit($response->getBody()->__toString(), 200)
+                );
             }
 
         } catch (\Exception $e) {
@@ -138,4 +134,38 @@ class Client
 
         return @json_decode($response->getBody()->__toString());
     }
+
+    private function getGuzzleClient()
+    {
+        if (!$this->guzzleClient) {
+            $stack = HandlerStack::create();
+            //$this->addHttpCaching($stack);
+
+            $this->guzzleClient = new Guzzle([
+                'handler' => $stack,
+                'base_uri' => $this->baseUrl,
+                'headers' => $this->headers
+            ]);
+        }
+
+        return $this->guzzleClient;
+    }
+
+    /* Commented out because we need a better way to let non-Laravel deployments use caching. If/When we
+     * get back to this, using Redis and tying into Laravel's Redis tools will require the following Composer
+     * dependencies:
+     *     "kevinrob/guzzle-cache-middleware": "^0.5",
+     *     "snc/redis-bundle": "^1.1"
+     * And we will need the following USE statements above:
+     *     use Snc\RedisBundle\Doctrine\Cache\RedisCache;
+     *     use Kevinrob\GuzzleCache\CacheMiddleware;
+     *     use Kevinrob\GuzzleCache\PrivateCache;
+     * /
+    private function addHttpCaching(HandlerStack $stack)
+    {
+        $redisCache = new RedisCache;
+        $redisCache->setRedis(app('redis')->connection());
+        $stack->push(new CacheMiddleware(new PrivateCache($redisCache)), 'cache');
+    }
+    */
 }
