@@ -2,7 +2,7 @@
 
 use PhoneCom\Sdk\Eloquent\Model;
 use PhoneCom\Sdk\QueryException;
-use PhoneCom\Sdk\Query\Builder;
+use PhoneCom\Sdk\Eloquent\Builder;
 
 class Sms extends Model
 {
