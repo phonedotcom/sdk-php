@@ -1,7 +1,11 @@
 <?php namespace PhoneCom\Sdk;
 
+use Doctrine\Common\Cache\RedisCache;
 use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Exception\ClientException;
+use Kevinrob\GuzzleCache\CacheMiddleware;
+use Kevinrob\GuzzleCache\PrivateCache;
 use PhoneCom\Sdk\Models\QueryBuilder;
 
 class Client
@@ -113,9 +117,14 @@ class Client
     protected function run($verb, $url, $options = [])
     {
         try {
-            // TODO: Guzzle HTTP caching!
+            $stack = HandlerStack::create();
+            $stack->push(new CacheMiddleware(new PrivateCache(new RedisCache)), 'cache');
 
-            $client = new Guzzle(['base_uri' => $this->baseUrl, 'headers' => $this->headers]);
+            $client = new Guzzle([
+                'handler' => $stack,
+                'base_uri' => $this->baseUrl,
+                'headers' => $this->headers
+            ]);
 
             $response = $client->request($verb, $url, $options);
 
