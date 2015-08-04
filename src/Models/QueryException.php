@@ -1,34 +1,14 @@
-<?php
-
-namespace PhoneCom\Sdk;
+<?php namespace PhoneCom\Sdk\Models;
 
 use GuzzleHttp\Exception\BadResponseException;
 use RuntimeException;
 
 class QueryException extends RuntimeException
 {
-    /**
-     * The SQL for the query.
-     *
-     * @var string
-     */
-    protected $sql;
+    protected $verb;
+    protected $url;
+    protected $options;
 
-    /**
-     * The bindings for the query.
-     *
-     * @var array
-     */
-    protected $bindings;
-
-    /**
-     * Create a new query exception instance.
-     *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @param  \Exception $previous
-     * @return void
-     */
     public function __construct($verb, $url, $options, $previous)
     {
         parent::__construct('', 0, $previous);
@@ -41,14 +21,6 @@ class QueryException extends RuntimeException
         $this->message = $this->formatMessage($verb, $url, $options, $previous);
     }
 
-    /**
-     * Format the SQL error message.
-     *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @param  \Exception $previous
-     * @return string
-     */
     protected function formatMessage($verb, $url, $options, $previous)
     {
         $message = $previous->getMessage();
@@ -62,31 +34,16 @@ class QueryException extends RuntimeException
         return $message;
     }
 
-    /**
-     * Get the verb for the query.
-     *
-     * @return string
-     */
     public function getVerb()
     {
         return $this->verb;
     }
 
-    /**
-     * Get the URL for the query.
-     *
-     * @return string
-     */
     public function getUrl()
     {
         return $this->url;
     }
 
-    /**
-     * Get the options for the query.
-     *
-     * @return array
-     */
     public function getOptions()
     {
         return $this->options;
