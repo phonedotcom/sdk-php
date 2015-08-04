@@ -7,8 +7,6 @@ class QueryBuilder
      */
     protected $client;
 
-    public $headers;
-
     public $from;
 
     public $wheres;
@@ -157,6 +155,13 @@ class QueryBuilder
         $result = $this->runSelect();
 
         return (array)$result->items;
+    }
+
+    public function getWithTotal()
+    {
+        $result = $this->runSelect();
+
+        return [(array)$result->items, (int)$result->total];
     }
 
     protected function runSelect()

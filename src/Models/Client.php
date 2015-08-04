@@ -71,6 +71,8 @@ class Client
     public function run($verb, $url, $options = [])
     {
         try {
+            // TODO: Guzzle HTTP caching!
+
             $client = new Guzzle(['base_uri' => $this->baseUrl, 'headers' => $this->headers]);
 
             $response = $client->request($verb, $url, $options);

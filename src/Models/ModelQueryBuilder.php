@@ -90,6 +90,13 @@ class ModelQueryBuilder
         return $this->model->hydrate($results);
     }
 
+    public function getWithTotal()
+    {
+        list($items, $total) = $this->query->getWithTotal();
+
+        return [$this->model->hydrate($items), $total];
+    }
+
     public function chunk($count, callable $callback)
     {
         $results = $this->forPage($page = 1, $count)->get();

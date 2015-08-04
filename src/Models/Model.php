@@ -16,8 +16,6 @@ abstract class Model implements ArrayAccess, Arrayable
     protected $pathInfo;
     protected $pathParams = [];
 
-    protected $perPage = 15;
-
     protected $attributes = [];
 
     public static function setClient(Client $client)
@@ -153,16 +151,6 @@ abstract class Model implements ArrayAccess, Arrayable
         $query = new QueryBuilder(self::$client);
 
         return (new ModelQueryBuilder($query))->setModel($this);
-    }
-
-    public function getPerPage()
-    {
-        return $this->perPage;
-    }
-
-    public function setPerPage($perPage)
-    {
-        $this->perPage = $perPage;
     }
 
     public function toArray()
