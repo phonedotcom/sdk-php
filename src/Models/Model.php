@@ -4,6 +4,9 @@ use ArrayAccess;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection as BaseCollection;
+use PhoneCom\Mason\Builder\Components\Control;
+use PhoneCom\Mason\Builder\Components\Controls;
+use PhoneCom\Mason\Builder\Document;
 use PhoneCom\Sdk\Client;
 
 abstract class Model implements ArrayAccess, Arrayable
@@ -17,6 +20,7 @@ abstract class Model implements ArrayAccess, Arrayable
     protected $pathParams = [];
 
     protected $attributes = [];
+    protected $masonControls;
 
     public static function setClient(Client $client)
     {
@@ -31,10 +35,31 @@ abstract class Model implements ArrayAccess, Arrayable
     public function fill(array $attributes)
     {
         foreach ($attributes as $key => $value) {
-            $this->setAttribute($key, $value);
+            if ($key == '@controls') {
+                $this->setControls($value);
+            } else {
+                $this->setAttribute($key, $value);
+            }
         }
 
         return $this;
+    }
+
+    private function setControls($controls)
+    {
+        if ($this->masonControls === null) {
+            $this->masonControls = new Controls();
+        }
+        foreach ($controls as $relation => $control) {
+            $this->masonControls->setControl($relation, new Control($control));
+        }
+
+        return $this;
+    }
+
+    public function getSelfUrl()
+    {
+        return $this->masonControls->self->href;
     }
 
     public function newInstance($attributes = [])
@@ -131,19 +156,21 @@ abstract class Model implements ArrayAccess, Arrayable
 
     public function update(array $attributes = [])
     {
-        return $this->newQuery()->update($attributes);
+        $attributes = array_merge($this->attributes, $attributes);
+        if (!@$attributes['id']) {
+            throw new \InvalidArgumentException('No id attribute is set');
+        }
+
+        return $this->newQuery()->where('id', 'eq', $attributes['id'])->update($attributes);
     }
 
     public function save()
     {
-        if (!empty($this->attributes['id'])) {
-            $this->newQuery()->where('id', 'eq', $this->attributes['id'])->update($this->attributes);
-
-        } else {
-            $this->newQuery()->insert($this->attributes);
+        if (empty($this->attributes['id'])) {
+            return $this->newQuery()->insert($this->attributes);
         }
 
-        return true;
+        return $this->newQuery()->where('id', 'eq', $this->attributes['id'])->update($this->attributes);
     }
 
     public function newQuery()
@@ -228,6 +255,21 @@ abstract class Model implements ArrayAccess, Arrayable
         $this->pathParams = $params;
 
         return $this;
+    }
+
+    public function toRootMason()
+    {
+        return new Document($this->toFullMason());
+    }
+
+    public function toFullMason()
+    {
+        return $this->toBriefMason();
+    }
+
+    public function toBriefMason()
+    {
+        return ['id' => $this->attributes['id']];
     }
 
     public function __isset($key)

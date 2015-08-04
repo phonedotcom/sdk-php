@@ -271,7 +271,7 @@ class QueryBuilder
     public function insert(array $values)
     {
         if (empty($values)) {
-            return true;
+            return [];
         }
 
         if (!is_array(reset($values))) {
@@ -284,14 +284,15 @@ class QueryBuilder
             }
         }
 
+        $responses = [];
         foreach ($values as $row) {
             $url = $this->compileUrl($this->from[0], @$this->from[1]);
             $options = ['json' => $row];
 
-            $this->client->insert($url, $options);
+            $responses[] = $this->client->insert($url, $options);
         }
 
-        return true;
+        return $responses;
     }
 
     public function insertGetId(array $values, $primaryKeyName = 'id')

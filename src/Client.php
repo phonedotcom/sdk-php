@@ -3,7 +3,6 @@
 use Illuminate\Support\Str;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Exception\ClientException;
 use PhoneCom\Sdk\Models\QueryBuilder;
 use PhoneCom\Sdk\Models\QueryException;
 

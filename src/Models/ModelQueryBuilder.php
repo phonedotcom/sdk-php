@@ -71,7 +71,9 @@ class ModelQueryBuilder
 
     public function first()
     {
-        return $this->take(1)->get()->first();
+        $items = $this->take(1)->get();
+
+        return ($items ? reset($items) : null);
     }
 
     public function firstOrFail()
