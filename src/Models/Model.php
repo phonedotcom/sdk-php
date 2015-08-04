@@ -1,10 +1,10 @@
 <?php namespace PhoneCom\Sdk\Models;
 
 use ArrayAccess;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection as BaseCollection;
+use PhoneCom\Sdk\Client;
 
 abstract class Model implements ArrayAccess, Arrayable
 {
@@ -170,7 +170,7 @@ abstract class Model implements ArrayAccess, Arrayable
 
     public function setAttribute($key, $value)
     {
-        $method = 'set'.Str::studly($key).'Attribute';
+        $method = 'set' . Str::studly($key) . 'Attribute';
         if (method_exists($this, $method)) {
             return $this->{$method}($value);
         }
