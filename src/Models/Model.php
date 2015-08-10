@@ -7,6 +7,8 @@ use Illuminate\Support\Collection as BaseCollection;
 use PhoneCom\Mason\Builder\Components\Control;
 use PhoneCom\Mason\Builder\Components\Controls;
 use PhoneCom\Mason\Builder\Document;
+use PhoneCom\Mason\Schema\DocumentSchema;
+use PhoneCom\Mason\Schema\JsonSchema;
 use PhoneCom\Sdk\Client;
 
 abstract class Model implements ArrayAccess, Arrayable
@@ -270,6 +272,45 @@ abstract class Model implements ArrayAccess, Arrayable
     public function toBriefMason()
     {
         return ['id' => $this->attributes['id']];
+    }
+
+    /**
+     * Get a top-level JSON Schema representation of a model. Output is a root Schema object, i.e. one that will
+     * _not_ be embedded within another schema.
+     *
+     * @return DocumentSchema
+     */
+    public static function getRootRelationSchema()
+    {
+        return DocumentSchema::make(null, static::getFullOutputSchema());
+    }
+
+    /**
+     * Get a Mason Schema representation of the model, with "full" properties. This can be used wherever a
+     * more-or-less complete version of a model's schema needs to be embedded within a JSON schema document.
+     *
+     * @return JsonSchema
+     */
+    public static function getFullOutputSchema()
+    {
+        return static::getBriefOutputSchema();
+    }
+
+    /**
+     * Get a Mason Schema representation of the model, with "brief" properties. This can be used wherever a
+     * minimal version of a model's schema needs to be embedded within a JSON schema document.
+     *
+     * @return JsonSchema
+     */
+    public static function getBriefOutputSchema()
+    {
+        // TODO: It's breaking MVC to require a controller as a dependency on a model. Find some other way
+        // TODO: to get a $ref to the @meta, @namespaces, and @controls definitions.
+
+        return JsonSchema::make()
+            ->setRequiredProperty('id', 'integer', ['title' => 'Internal Phone.com ID'])
+            ->setProperty('@controls', 'object', ['title' => 'Mason controls'])
+            ->setAdditionalProperties(false);
     }
 
     public function __isset($key)
