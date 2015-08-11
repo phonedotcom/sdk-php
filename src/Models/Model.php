@@ -2,6 +2,7 @@
 
 use ArrayAccess;
 use PhoneCom\Sdk\Client;
+use PhoneCom\Sdk\Exceptions\BadConfigurationException;
 
 abstract class Model implements ArrayAccess
 {
@@ -22,6 +23,10 @@ abstract class Model implements ArrayAccess
 
     public function __construct(array $attributes = [])
     {
+        if (!self::$client) {
+            throw new BadConfigurationException('No API client has been set');
+        }
+
         $this->fill($attributes);
     }
 
@@ -130,12 +135,12 @@ abstract class Model implements ArrayAccess
 
     public function update(array $attributes = [])
     {
-        $attributes = array_merge($this->attributes, $attributes);
-        if (!@$attributes['id']) {
+        $this->fill($attributes);
+        if (!@$this->attributes['id']) {
             throw new \InvalidArgumentException('No id attribute is set');
         }
 
-        return $this->newQuery()->where('id', 'eq', $attributes['id'])->update($attributes);
+        return $this->newQuery()->where('id', 'eq', $this->attributes['id'])->update($this->attributes);
     }
 
     public function save()

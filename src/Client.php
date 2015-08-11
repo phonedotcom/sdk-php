@@ -1,9 +1,11 @@
 <?php namespace PhoneCom\Sdk;
 
 use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
 use PhoneCom\Sdk\Models\QueryBuilder;
 use PhoneCom\Sdk\Models\QueryException;
+use PhoneCom\Sdk\Exceptions\BadConfigurationException;
 
 class Client
 {
@@ -127,6 +129,10 @@ class Client
             }
 
         } catch (\Exception $e) {
+            if ($e instanceof ClientException && $e->getCode() == 401) {
+                throw new BadConfigurationException('Missing or invalid API login credentials');
+            }
+
             throw new QueryException($verb, $url, $options, $e);
         }
 
