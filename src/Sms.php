@@ -7,7 +7,7 @@ class Sms extends Model
     protected $pathInfo = '/sms';
 
     /**
-     * @return array List of SMS test messages created
+     * @return array List of messages created
      */
     public static function create(array $attributes = [])
     {

@@ -1,18 +1,39 @@
 <?php namespace PhoneCom\Sdk;
 
-use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
 use PhoneCom\Sdk\Models\QueryBuilder;
 use PhoneCom\Sdk\Models\QueryException;
 use PhoneCom\Sdk\Exceptions\BadConfigurationException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
 
 class Client
 {
-    private $guzzleClient;
-
     protected $baseUrl = 'https://v2.api.phone.com';
     protected $headers = [];
+
+    /**
+     * List of responses to dole out each time Guzzle is asked to get something. Used only for testing.
+     * @var array
+     */
+    private static $mockResponses;
+
+    public static function setMockResponses(array $responses = [])
+    {
+        foreach ($responses as $response) {
+            if (!$response instanceof Response) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Response must be an instance of %s, but %s was given',
+                    Response::class,
+                    (is_object($response) ? get_class($response) : gettype($response))
+                ));
+            }
+        }
+
+        self::$mockResponses = $responses;
+    }
 
     public function __construct(array $config = [])
     {
@@ -97,7 +118,16 @@ class Client
 
     public function select($url, $options = [])
     {
-        return $this->run('GET', $url, $options);
+        try {
+            return $this->run('GET', $url, $options);
+
+        } catch (QueryException $e) {
+            if ($e->getPrevious()->getCode() == 404) {
+                return null;
+            }
+
+            throw $e;
+        }
     }
 
     public function insert($url, $options = [])
@@ -150,18 +180,20 @@ class Client
 
     private function getGuzzleClient()
     {
-        if (!$this->guzzleClient) {
-            $stack = HandlerStack::create();
-            //$this->addHttpCaching($stack);
+        $stack = HandlerStack::create();
 
-            $this->guzzleClient = new Guzzle([
-                'handler' => $stack,
-                'base_uri' => $this->baseUrl,
-                'headers' => $this->headers
-            ]);
+        if (self::$mockResponses) {
+            $handler = new MockHandler(self::$mockResponses);
+            $stack->setHandler($handler);
         }
 
-        return $this->guzzleClient;
+        //$this->addHttpCaching($stack);
+
+        return new HttpClient([
+            'handler' => $stack,
+            'base_uri' => $this->baseUrl,
+            'headers' => $this->headers
+        ]);
     }
 
     /* Commented out because we need a better way to let non-Laravel deployments use caching. If/When we

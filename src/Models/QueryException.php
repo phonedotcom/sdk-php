@@ -17,7 +17,6 @@ class QueryException extends RuntimeException
         $this->url = $url;
         $this->options = $options;
         $this->previous = $previous;
-        $this->code = $previous->getCode();
         $this->message = $this->formatMessage($verb, $url, $options, $previous);
     }
 

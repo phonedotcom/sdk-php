@@ -156,7 +156,11 @@ class QueryBuilder
     {
         $result = $this->runSelect();
 
-        return (array)$result->items;
+        if (empty(@$result->items) || !is_array($result->items)) {
+            return [];
+        }
+
+        return $result->items;
     }
 
     public function getWithTotal()
@@ -240,7 +244,7 @@ class QueryBuilder
         $results = $this->forPage($page = 1, $count)->get();
 
         while (count($results) > 0) {
-            if (call_user_func($callback, $results) === false) {
+            if (call_user_func($callback, $results) === false || count($results) !== $count) {
                 break;
             }
 
