@@ -1,7 +1,6 @@
 <?php namespace PhoneCom\Sdk\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use PhoneCom\Mason\Schema\DocumentSchema;
 use PhoneCom\Sdk\Client;
 use PhoneCom\Sdk\Models\Model;
 
