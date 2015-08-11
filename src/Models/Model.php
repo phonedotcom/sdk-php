@@ -18,6 +18,9 @@ abstract class Model implements ArrayAccess, Arrayable
      */
     private static $client;
 
+    private static $sharedSchemaRefUrlPrefix = '';
+    private static $masonSchemaRefUrlPrefix = '';
+
     protected $pathInfo;
     protected $pathParams = [];
 
@@ -27,6 +30,22 @@ abstract class Model implements ArrayAccess, Arrayable
     public static function setClient(Client $client)
     {
         self::$client = $client;
+    }
+
+    public static function setSharedSchemaRefUrlPrefixes(array $prefixes)
+    {
+        self::$sharedSchemaRefUrlPrefix = (string)@$prefixes['shared'];
+        self::$masonSchemaRefUrlPrefix = (string)@$prefixes['mason'];
+    }
+
+    protected static function getMasonSchemaRefUrl($name)
+    {
+        return self::$masonSchemaRefUrlPrefix . "#definitions/$name";
+    }
+
+    protected static function getSharedSchemaRefUrl($name)
+    {
+        return self::$sharedSchemaRefUrlPrefix . "#definitions/$name";
     }
 
     public function __construct(array $attributes = [])
@@ -304,12 +323,9 @@ abstract class Model implements ArrayAccess, Arrayable
      */
     public static function getBriefOutputSchema()
     {
-        // TODO: It's breaking MVC to require a controller as a dependency on a model. Find some other way
-        // TODO: to get a $ref to the @meta, @namespaces, and @controls definitions.
-
         return JsonSchema::make()
             ->setRequiredProperty('id', 'integer', ['title' => 'Internal Phone.com ID'])
-            ->setProperty('@controls', 'object', ['title' => 'Mason controls'])
+            ->setPropertyRef('@controls', self::getMasonSchemaRefUrl('controls'))
             ->setAdditionalProperties(false);
     }
 

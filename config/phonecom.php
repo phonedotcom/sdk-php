@@ -23,5 +23,19 @@ return [
     /**
      * Whether to operate in debug mode. For performance, set to false.
      */
-    'debug' => env('PHONECOM_DEBUG', false)
+    'debug' => env('PHONECOM_DEBUG', false),
+
+    'schema' => [
+        /**
+         * In JSON Schema documents, it is helpful to use the $ref property to point to other snippets of schema
+         * in order to avoid repeating the same portions in multiple places. This library provides a way to refer
+         * to two sources of these snippets: a shared location for custom definitions, and a separate location for
+         * definitions related to the Mason media type. If no URL prefixes are defined below, the default is that
+         * $ref will point to the definitions within the current document.
+         */
+        'ref_url_prefixes' => [
+            'shared' => env('PHONECOM_SHARED_REF_PREFIX', ''),
+            'mason' => env('PHONECOM_MASON_REF_PREFIX', '')
+        ]
+    ]
 ];

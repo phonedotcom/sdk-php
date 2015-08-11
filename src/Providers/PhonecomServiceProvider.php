@@ -1,6 +1,7 @@
 <?php namespace PhoneCom\Sdk\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use PhoneCom\Mason\Schema\DocumentSchema;
 use PhoneCom\Sdk\Client;
 use PhoneCom\Sdk\Models\Model;
 
@@ -22,5 +23,9 @@ class PhonecomServiceProvider extends ServiceProvider
         }
 
         Model::setClient($this->app['phonecom']);
+
+        $prefixes = config('phonecom.schema.ref_url_prefixes');
+        Model::setSharedSchemaRefUrlPrefixes($prefixes);
+        DocumentSchema::setSharedSchemaRefUrlPrefixes($prefixes);
     }
 }
