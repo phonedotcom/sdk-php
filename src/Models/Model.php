@@ -1,13 +1,9 @@
 <?php namespace PhoneCom\Sdk\Models;
 
 use ArrayAccess;
-use Illuminate\Support\Str;
-use Illuminate\Contracts\Support\Arrayable;
-use PhoneCom\Mason\Builder\Components\Control;
-use PhoneCom\Mason\Builder\Components\Controls;
 use PhoneCom\Sdk\Client;
 
-abstract class Model implements ArrayAccess, Arrayable
+abstract class Model implements ArrayAccess
 {
     /**
      * @var Client
@@ -18,7 +14,6 @@ abstract class Model implements ArrayAccess, Arrayable
     protected $pathParams = [];
 
     protected $attributes = [];
-    protected $masonControls;
 
     public static function setClient(Client $client)
     {
@@ -33,31 +28,12 @@ abstract class Model implements ArrayAccess, Arrayable
     public function fill(array $attributes)
     {
         foreach ($attributes as $key => $value) {
-            if ($key == '@controls') {
-                $this->setControls($value);
-            } else {
+            if (substr($key, 0, 1) != '@') {
                 $this->setAttribute($key, $value);
             }
         }
 
         return $this;
-    }
-
-    private function setControls($controls)
-    {
-        if ($this->masonControls === null) {
-            $this->masonControls = new Controls();
-        }
-        foreach ($controls as $relation => $control) {
-            $this->masonControls->setControl($relation, new Control($control));
-        }
-
-        return $this;
-    }
-
-    public function getSelfUrl()
-    {
-        return $this->masonControls->self->href;
     }
 
     public function newInstance($attributes = [])
@@ -185,7 +161,7 @@ abstract class Model implements ArrayAccess, Arrayable
 
     public function getAttribute($key)
     {
-        $method = 'get' . Str::studly($key) . 'Attribute';
+        $method = 'get' . $this->studlyCase($key) . 'Attribute';
         if (method_exists($this, $method)) {
             return $this->{$method};
         }
@@ -195,7 +171,7 @@ abstract class Model implements ArrayAccess, Arrayable
 
     public function setAttribute($key, $value)
     {
-        $method = 'set' . Str::studly($key) . 'Attribute';
+        $method = 'set' . $this->studlyCase($key) . 'Attribute';
         if (method_exists($this, $method)) {
             return $this->{$method}($value);
         }
@@ -257,7 +233,7 @@ abstract class Model implements ArrayAccess, Arrayable
 
     public function __isset($key)
     {
-        $method = 'get' . Str::studly($key) . 'Attribute';
+        $method = 'get' . $this->studlyCase($key) . 'Attribute';
 
         return (@$this->attributes[$key] || method_exists($this, $method));
     }
@@ -279,5 +255,10 @@ abstract class Model implements ArrayAccess, Arrayable
         $instance = new static;
 
         return call_user_func_array([$instance, $method], $parameters);
+    }
+
+    private function studlyCase($value)
+    {
+        return str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $value)));
     }
 }

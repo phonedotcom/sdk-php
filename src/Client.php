@@ -1,6 +1,5 @@
 <?php namespace PhoneCom\Sdk;
 
-use Illuminate\Support\Str;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\HandlerStack;
 use PhoneCom\Sdk\Models\QueryBuilder;
@@ -119,11 +118,11 @@ class Client
         try {
             $response = $this->getGuzzleClient()->request($verb, $url, $options);
 
-            if ($response->getHeaderLine('X-KevinRob-Cache') != 'HIT'
-                && $response->getHeaderLine('Content-Type') != 'application/vnd.mason+json'
+            if (/*$response->getHeaderLine('X-KevinRob-Cache') != 'HIT'
+                &&*/ $response->getHeaderLine('Content-Type') != 'application/vnd.mason+json'
             ) {
                 throw new \Exception(
-                    'API response is not a Mason document: ' . Str::limit($response->getBody()->__toString(), 200)
+                    'API response is not a Mason document: ' . $this->truncate($response->getBody()->__toString(), 200)
                 );
             }
 
@@ -132,6 +131,15 @@ class Client
         }
 
         return @json_decode($response->getBody()->__toString());
+    }
+
+    private function truncate($value, $limit = 100, $end = '...')
+    {
+        if (mb_strwidth($value, 'UTF-8') <= $limit) {
+            return $value;
+        }
+
+        return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')) . $end;
     }
 
     private function getGuzzleClient()
