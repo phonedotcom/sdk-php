@@ -18,9 +18,6 @@ abstract class Model implements ArrayAccess, Arrayable
      */
     private static $client;
 
-    private static $sharedSchemaRefUrlPrefix = '';
-    private static $masonSchemaRefUrlPrefix = '';
-
     protected $pathInfo;
     protected $pathParams = [];
 
@@ -30,22 +27,6 @@ abstract class Model implements ArrayAccess, Arrayable
     public static function setClient(Client $client)
     {
         self::$client = $client;
-    }
-
-    public static function setSharedSchemaRefUrlPrefixes(array $prefixes)
-    {
-        self::$sharedSchemaRefUrlPrefix = (string)@$prefixes['shared'];
-        self::$masonSchemaRefUrlPrefix = (string)@$prefixes['mason'];
-    }
-
-    protected static function getMasonSchemaRefUrl($name)
-    {
-        return self::$masonSchemaRefUrlPrefix . "#definitions/$name";
-    }
-
-    protected static function getSharedSchemaRefUrl($name)
-    {
-        return self::$sharedSchemaRefUrlPrefix . "#definitions/$name";
     }
 
     public function __construct(array $attributes = [])
@@ -276,57 +257,6 @@ abstract class Model implements ArrayAccess, Arrayable
         $this->pathParams = $params;
 
         return $this;
-    }
-
-    public function toRootMason()
-    {
-        return new Document($this->toFullMason());
-    }
-
-    public function toFullMason()
-    {
-        return $this->toBriefMason();
-    }
-
-    public function toBriefMason()
-    {
-        return ['id' => $this->attributes['id']];
-    }
-
-    /**
-     * Get a top-level JSON Schema representation of a model. Output is a root Schema object, i.e. one that will
-     * _not_ be embedded within another schema.
-     *
-     * @return DocumentSchema
-     */
-    public static function getRootRelationSchema()
-    {
-        return DocumentSchema::make(null, static::getFullOutputSchema());
-    }
-
-    /**
-     * Get a Mason Schema representation of the model, with "full" properties. This can be used wherever a
-     * more-or-less complete version of a model's schema needs to be embedded within a JSON schema document.
-     *
-     * @return JsonSchema
-     */
-    public static function getFullOutputSchema()
-    {
-        return static::getBriefOutputSchema();
-    }
-
-    /**
-     * Get a Mason Schema representation of the model, with "brief" properties. This can be used wherever a
-     * minimal version of a model's schema needs to be embedded within a JSON schema document.
-     *
-     * @return JsonSchema
-     */
-    public static function getBriefOutputSchema()
-    {
-        return JsonSchema::make()
-            ->setRequiredProperty('id', 'integer', ['title' => 'Internal Phone.com ID'])
-            ->setPropertyRef('@controls', self::getMasonSchemaRefUrl('controls'))
-            ->setAdditionalProperties(false);
     }
 
     public function __isset($key)

@@ -23,9 +23,5 @@ class PhonecomServiceProvider extends ServiceProvider
         }
 
         Model::setClient($this->app['phonecom']);
-
-        $prefixes = config('phonecom.schema.ref_url_prefixes');
-        Model::setSharedSchemaRefUrlPrefixes($prefixes);
-        DocumentSchema::setSharedSchemaRefUrlPrefixes($prefixes);
     }
 }
