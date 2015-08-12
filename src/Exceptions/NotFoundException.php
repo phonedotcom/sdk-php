@@ -1,4 +1,4 @@
-<?php namespace PhoneCom\Sdk\Models;
+<?php namespace PhoneCom\Sdk\Exceptions;
 
 class NotFoundException extends \RuntimeException
 {

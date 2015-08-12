@@ -1,5 +1,7 @@
 <?php namespace PhoneCom\Sdk\Models;
 
+use PhoneCom\Sdk\Exceptions\NotFoundException;
+
 class ModelQueryBuilder
 {
     /**

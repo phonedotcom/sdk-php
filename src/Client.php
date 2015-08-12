@@ -3,11 +3,12 @@
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
-use PhoneCom\Sdk\Models\QueryBuilder;
-use PhoneCom\Sdk\Models\QueryException;
-use PhoneCom\Sdk\Exceptions\BadConfigurationException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
+use PhoneCom\Sdk\Models\QueryBuilder;
+use PhoneCom\Sdk\Exceptions\BadConfigurationException;
+use PhoneCom\Sdk\Exceptions\QueryException;
+use PhoneCom\Sdk\Exceptions\ValidationException;
 
 class Client
 {
@@ -164,8 +165,15 @@ class Client
             }
 
         } catch (\Exception $e) {
-            if ($e instanceof ClientException && $e->getCode() == 401) {
-                throw new BadConfigurationException('Missing or invalid API login credentials');
+            if ($e instanceof ClientException) {
+                if ($e->getCode() == 401) {
+                    throw new BadConfigurationException('Missing or invalid API login credentials');
+
+                } elseif ($e->getCode() == 422) {
+                    $data = @json_decode($e->getResponse()->getBody()->__toString(), true);
+
+                    throw new ValidationException('', $data['@error']['fields']);
+                }
             }
 
             throw new QueryException($verb, $url, $options, $e);
