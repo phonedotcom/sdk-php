@@ -35,6 +35,11 @@ class Client
         self::$mockResponses = $responses;
     }
 
+    public static function flushMockResponses()
+    {
+        self::$mockResponses = null;
+    }
+
     public function __construct(array $config = [])
     {
         $this->setConfig($config);
