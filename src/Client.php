@@ -1,5 +1,6 @@
 <?php namespace PhoneCom\Sdk;
 
+use Closure;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
@@ -14,6 +15,11 @@ class Client
 {
     protected $baseUrl = 'https://v2.api.phone.com';
     protected $headers = [];
+
+    /**
+     * @var \Closure
+     */
+    protected $listener;
 
     /**
      * List of responses to dole out each time Guzzle is asked to get something. Used only for testing.
@@ -52,6 +58,7 @@ class Client
             ->setBaseUrl(@$config['url'])
             ->setHeaders(@$config['headers'])
             ->setDebug(@$config['debug'])
+            ->setListener(@$config['listener'])
             ->setAuthBasic(@$config['username'], @$config['password']);
     }
 
@@ -67,6 +74,20 @@ class Client
     public function setHeader($name, $value)
     {
         $this->headers[$name] = $value;
+
+        return $this;
+    }
+
+    public function listen(Closure $listener)
+    {
+        return $this->setListener($listener);
+    }
+
+    public function setListener(Closure $listener = null)
+    {
+        if ($listener) {
+            $this->listener = $listener;
+        }
 
         return $this;
     }
@@ -153,6 +174,8 @@ class Client
 
     protected function run($verb, $url, $options = [])
     {
+        $start = microtime(true);
+
         try {
             $response = $this->getGuzzleClient()->request($verb, $url, $options);
 
@@ -177,6 +200,13 @@ class Client
             }
 
             throw new QueryException($verb, $url, $options, $e);
+
+        } finally {
+            if ($this->listener) {
+                $time = round(microtime(true) - $start, 2);
+                $callable = $this->listener;
+                $callable($verb, $url, $options, $time);
+            }
         }
 
         return @json_decode($response->getBody()->__toString());
