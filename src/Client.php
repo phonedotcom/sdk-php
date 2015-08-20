@@ -6,10 +6,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
-use PhoneCom\Sdk\Models\QueryBuilder;
-use PhoneCom\Sdk\Exceptions\BadConfigurationException;
-use PhoneCom\Sdk\Exceptions\QueryException;
-use PhoneCom\Sdk\Exceptions\ValidationException;
+use PhoneCom\Sdk\Query\Builder as QueryBuilder;
 
 class Client
 {

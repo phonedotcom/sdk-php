@@ -1,16 +1,16 @@
-<?php namespace PhoneCom\Sdk\Models;
+<?php namespace PhoneCom\Sdk\Eloquent;
 
-use PhoneCom\Sdk\Exceptions\NotFoundException;
+use PhoneCom\Sdk\Query\Builder as QueryBuilder;
 
-class ModelQueryBuilder
+class Builder
 {
     /**
-     * @var \PhoneCom\Sdk\QueryBuilder
+     * @var \PhoneCom\Sdk\Query\Builder
      */
     protected $query;
 
     /**
-     * @var \PhoneCom\Sdk\Model
+     * @var \PhoneCom\Sdk\Eloquent\Model
      */
     protected $model;
 
@@ -18,8 +18,7 @@ class ModelQueryBuilder
      * @var array
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getVerb', 'getUrl', 'getOptions',
-        'exists', 'count',
+        'insert', 'insertGetId', 'getVerb', 'getUrl', 'getOptions', 'exists', 'count',
     ];
 
     public function __construct(QueryBuilder $query)
@@ -68,14 +67,14 @@ class ModelQueryBuilder
             return $result;
         }
 
-        throw (new NotFoundException)->setModel(get_class($this->model));
+        throw (new ModelNotFoundException)->setModel(get_class($this->model));
     }
 
     public function first()
     {
         $items = $this->take(1)->get();
 
-        return ($items ? reset($items) : null);
+        return ($items ? $items->first() : null);
     }
 
     public function firstOrFail()
@@ -84,12 +83,19 @@ class ModelQueryBuilder
             return $model;
         }
 
-        throw (new NotFoundException)->setModel(get_class($this->model));
+        throw (new ModelNotFoundException)->setModel(get_class($this->model));
     }
 
     public function get()
     {
         $results = $this->query->get();
+
+        return $this->model->hydrate($results);
+    }
+
+    public function insertCollection($attributes)
+    {
+        $results = $this->query->insertCollection($attributes);
 
         return $this->model->hydrate($results);
     }
@@ -103,17 +109,13 @@ class ModelQueryBuilder
 
     public function chunk($count, callable $callback)
     {
-        $results = $this->forPage($page = 1, $count)->get();
-
-        while (count($results) > 0) {
-            if (call_user_func($callback, $results) === false) {
-                break;
-            }
-
-            $page++;
-
-            $results = $this->forPage($page, $count)->get();
-        }
+        $this->limit($count);
+        $offset = 0;
+        do {
+            $results = $this->offset($offset)->get();
+            $returnValue = call_user_func($callback, $results);
+            $offset += $count;
+        } while (count($results) == $count && $returnValue !== false);
     }
 
     public function update(array $values)

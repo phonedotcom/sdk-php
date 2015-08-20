@@ -1,8 +1,8 @@
-<?php namespace PhoneCom\Sdk\Models;
+<?php namespace PhoneCom\Sdk\Query;
 
 use PhoneCom\Sdk\Client;
 
-class QueryBuilder
+class Builder
 {
     /**
      * @var Client
@@ -154,13 +154,22 @@ class QueryBuilder
 
     public function get()
     {
-        $result = $this->runSelect();
+        $originalLimit = $this->limit;
+        $originalOffset = $this->offset;
+        $this->offset = ($originalOffset ?: 0);
+        $this->limit = ($originalLimit ?: 100);
 
-        if (empty(@$result->items) || !is_array($result->items)) {
-            return [];
-        }
+        $items = [];
+        do {
+            $data = $this->runSelect();
+            $items = array_merge($items, $data->items);
+            $this->offset += $this->limit;
+        } while (count($data->items) == $this->limit && !$originalLimit);
 
-        return $result->items;
+        $this->limit = $originalLimit;
+        $this->offset = $originalOffset;
+
+        return $items;
     }
 
     public function getWithTotal()
@@ -241,17 +250,13 @@ class QueryBuilder
 
     public function chunk($count, callable $callback)
     {
-        $results = $this->forPage($page = 1, $count)->get();
-
-        while (count($results) > 0) {
-            if (call_user_func($callback, $results) === false || count($results) !== $count) {
-                break;
-            }
-
-            $page++;
-
-            $results = $this->forPage($page, $count)->get();
-        }
+        $this->limit($count);
+        $offset = 0;
+        do {
+            $results = $this->offset($offset)->get();
+            $returnValue = call_user_func($callback, $results);
+            $offset += $count;
+        } while (count($results) == $count && $returnValue !== false);
     }
 
     public function exists()
@@ -299,15 +304,35 @@ class QueryBuilder
         return $responses;
     }
 
-    public function insertGetId(array $values, $primaryKeyName = 'id')
+    /**
+     * Insert a new record and get the value of the primary key.
+     *
+     * @param  array   $values
+     * @param  string  $sequence
+     * @return int
+     */
+    public function insertGetId(array $values, $sequence = null)
     {
         $url = $this->compileUrl($this->from[0], @$this->from[1]);
         $options = ['json' => $values];
 
-        $item = $this->client->insert($url, $options);
-        $id = $item->{$primaryKeyName};
+        $data = $this->client->insert($url, $options);
+
+        $sequence || $sequence = 'id';
+
+        $id = $data->{$sequence};
 
         return is_numeric($id) ? (int) $id : $id;
+    }
+
+    public function insertCollection(array $values)
+    {
+        $url = $this->compileUrl($this->from[0], @$this->from[1]);
+        $options = ['json' => $values];
+
+        $data = $this->client->insert($url, $options);
+
+        return $data->items;
     }
 
     public function update(array $values)
