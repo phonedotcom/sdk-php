@@ -420,7 +420,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Create a new model instance that is existing.
      *
      * @param  array  $attributes
-     * @param  string|null  $connection
      * @return static
      */
     public function newFromBuilder($attributes = [])
@@ -436,7 +435,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Create a collection of models from plain arrays.
      *
      * @param  array  $items
-     * @param  string|null  $connection
      * @return Collection
      */
     public static function hydrate(array $items)
@@ -448,23 +446,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }, $items);
 
         return $instance->newCollection($items);
-    }
-
-    /**
-     * Create a collection of models from a raw query.
-     *
-     * @param  string  $query
-     * @param  array  $bindings
-     * @param  string|null  $connection
-     * @return Collection
-     */
-    public static function hydrateRaw($query, $bindings = [], $connection = null)
-    {
-        $instance = (new static)->setConnection($connection);
-
-        $items = $instance->getConnection()->select($query, $bindings);
-
-        return static::hydrate($items, $connection);
     }
 
     /**
@@ -1874,13 +1855,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($this->relationLoaded($key)) {
             return $this->relations[$key];
         }
-
-        // If the "attribute" exists as a method on the model, we will just assume
-        // it is a relationship and will load and return results from the query
-        // and hydrate the relationship's value on the "relationships" array.
-        if (method_exists($this, $key)) {
-            return $this->getRelationshipFromMethod($key);
-        }
     }
 
     /**
@@ -2025,13 +1999,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // which simply lets the developers tweak the attribute as it is set on
         // the model, such as "json_encoding" an listing of data for storage.
         if ($this->hasSetMutator($key)) {
-            $method = 'set'.Str::studly($key).'Attribute';
+            $method = 'set' . Str::studly($key) . 'Attribute';
 
             return $this->{$method}($value);
-        } // If an attribute is listed as a "date", we'll convert it from a DateTime
+
+        // If an attribute is listed as a "date", we'll convert it from a DateTime
         // instance into a form proper for storage on the database tables using
         // the connection grammar's date format. We will auto set the values.
-        elseif (in_array($key, $this->getDates()) && $value) {
+        } elseif (in_array($key, $this->getDates()) && $value) {
             $value = $this->fromDateTime($value);
         }
 
