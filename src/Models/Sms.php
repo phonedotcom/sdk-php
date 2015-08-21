@@ -1,6 +1,6 @@
-<?php namespace PhoneCom\Sdk;
+<?php namespace PhoneCom\Sdk\Models;
 
-use PhoneCom\Sdk\Eloquent\Model;
+use PhoneCom\Sdk\Api\Eloquent\Model;
 
 class Sms extends Model
 {

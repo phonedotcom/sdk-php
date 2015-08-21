@@ -1,5 +1,5 @@
 <?php
-namespace PhoneCom\Sdk;
+namespace PhoneCom\Sdk\Api;
 
 /**
  * This exception gets thrown in various situations when the SDK is not configured properly.

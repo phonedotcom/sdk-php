@@ -1,6 +1,6 @@
 <?php
 
-namespace PhoneCom\Sdk\Eloquent;
+namespace PhoneCom\Sdk\Api\Eloquent;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
@@ -12,7 +12,7 @@ class Collection extends BaseCollection
      *
      * @param  mixed  $key
      * @param  mixed  $default
-     * @return \PhoneCom\Sdk\Eloquent\Model
+     * @return \PhoneCom\Sdk\Api\Eloquent\Model
      */
     public function find($key, $default = null)
     {

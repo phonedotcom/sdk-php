@@ -1,8 +1,8 @@
-<?php namespace PhoneCom\Sdk\Providers;
+<?php namespace PhoneCom\Sdk\Laravel;
 
 use Illuminate\Support\ServiceProvider;
-use PhoneCom\Sdk\Client;
-use PhoneCom\Sdk\Models\Model;
+use PhoneCom\Sdk\Api\Client;
+use PhoneCom\Sdk\Api\Eloquent\Model;
 
 class PhonecomServiceProvider extends ServiceProvider
 {

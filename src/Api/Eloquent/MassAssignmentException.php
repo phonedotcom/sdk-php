@@ -1,6 +1,6 @@
 <?php
 
-namespace PhoneCom\Sdk\Eloquent;
+namespace PhoneCom\Sdk\Api\Eloquent;
 
 use RuntimeException;
 

@@ -1,6 +1,6 @@
-<?php namespace PhoneCom\Sdk\Query;
+<?php namespace PhoneCom\Sdk\Api\Query;
 
-use PhoneCom\Sdk\Client;
+use PhoneCom\Sdk\Api\Client;
 
 class Builder
 {
@@ -76,6 +76,16 @@ class Builder
         $this->wheres[] = compact('column', 'operator', 'value');
 
         return $this;
+    }
+
+    public function whereIn($column, $values)
+    {
+        return $this->where($column, 'in', $values);
+    }
+
+    public function whereNotIn($column, $values)
+    {
+        return $this->where($column, 'not-in', $values);
     }
 
     public function getCountForPagination()

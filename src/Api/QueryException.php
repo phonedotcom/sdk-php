@@ -1,4 +1,4 @@
-<?php namespace PhoneCom\Sdk;
+<?php namespace PhoneCom\Sdk\Api;
 
 use GuzzleHttp\Exception\BadResponseException;
 use RuntimeException;
