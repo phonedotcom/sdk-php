@@ -106,7 +106,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @var array
      */
-    protected $guarded = ['*'];
+    protected $guarded = [];
 
     /**
      * The attributes that should be mutated to dates.
