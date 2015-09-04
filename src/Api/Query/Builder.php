@@ -63,6 +63,7 @@ class Builder
             foreach ($column as $key => $value) {
                 $this->where($key, 'eq', $value);
             }
+            return;
         }
 
         if (func_num_args() == 2) {

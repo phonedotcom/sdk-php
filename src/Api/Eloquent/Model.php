@@ -802,7 +802,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             static::$listeners[$key][$priority] = [];
         }
 
-        static::$listeners[$key][$priority] = $callback;
+        static::$listeners[$key][$priority][] = $callback;
     }
 
     /**
@@ -1109,7 +1109,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         krsort(static::$listeners[$event]);
         foreach (static::$listeners[$event] as $priority => $callbacks) {
             foreach ($callbacks as $callback) {
-                $result = $callback($this);
+                if (is_string($callback)) {
+                    list($className, $method) = explode('@', $callback);
+                    $instance = new $className();
+                    $result = $instance->$method($this);
+                } else {
+                    $result = $callback($this);
+                }
                 if ($halt && $result !== null) {
                     return $result;
                 }
