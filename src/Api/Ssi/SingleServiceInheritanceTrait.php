@@ -38,7 +38,10 @@ trait SingleServiceInheritanceTrait
             $subclasses = static::$singleServiceSubclasses;
             if (!in_array($calledClass, $subclasses)) {
                 foreach ($subclasses as $subclass) {
-                    $typeMap = array_merge($typeMap, $subclass::getSingleServiceTypeMap());
+                    // array_merge() won't work if the singleServiceType values are numeric, so we brute-force it.
+                    foreach ($subclass::getSingleServiceTypeMap() as $key => $value) {
+                        $typeMap[$key] = $value;
+                    }
                 }
             }
         }
