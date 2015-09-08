@@ -120,7 +120,7 @@ trait SingleServiceInheritanceTrait
     {
         $modelClass = get_class($this);
         $classType = (property_exists($modelClass, 'singleServiceType') ? $modelClass::$singleServiceType : null);
-        if (!$classType) {
+        if ($classType === null) {
             throw new SingleServiceInheritanceException(
                 'Cannot save Single service inheritance model without declaring static property $singleServiceType.'
             );
