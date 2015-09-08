@@ -44,13 +44,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $pathParams = [];
 
     /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = true;
-
-    /**
      * The model's attributes.
      *
      * @var array
@@ -1032,23 +1025,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return null;
         }
 
-        // If the model has an incrementing key, we can use the "insertGetId" method on
-        // the query builder, which will give us back the final inserted ID for this
-        // table from the database. Not all tables have to be incrementing though.
-        $attributes = $this->attributes;
+        $attributes = $this->toArray();
 
         if ($this->insertReturnsCollection) {
             $result = $this->insertCollection($query, $attributes);
 
-        } elseif ($this->incrementing) {
-            $this->insertAndSetId($query, $attributes);
-            $result = $this;
-
-        // If the table is not incrementing we'll simply insert this attributes as they
-        // are, as this attributes arrays must contain an "id" column already placed
-        // there by the developer as the manually determined key for these models.
         } else {
-            $query->insert($attributes);
+            $data = $this->insert($attributes);
+            $this->fill((array)$data[0]);
+
             $result = $this;
         }
 
@@ -1578,27 +1563,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function totallyGuarded()
     {
         return count($this->fillable) == 0 && $this->guarded == ['*'];
-    }
-
-    /**
-     * Get the value indicating whether the IDs are incrementing.
-     *
-     * @return bool
-     */
-    public function getIncrementing()
-    {
-        return $this->incrementing;
-    }
-
-    /**
-     * Set whether IDs are incrementing.
-     *
-     * @param  bool  $value
-     * @return void
-     */
-    public function setIncrementing($value)
-    {
-        $this->incrementing = $value;
     }
 
     /**

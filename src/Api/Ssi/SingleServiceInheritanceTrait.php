@@ -119,14 +119,14 @@ trait SingleServiceInheritanceTrait
     public function setSingleServiceType()
     {
         $modelClass = get_class($this);
-        $classType = (property_exists($modelClass, 'singleServiceType') ? $modelClass::$singleServiceType : null);
-        if ($classType === null) {
+        if (!property_exists($modelClass, 'singleServiceType')) {
             throw new SingleServiceInheritanceException(
                 'Cannot save Single service inheritance model without declaring static property $singleServiceType.'
             );
-        }
 
-        $this->{static::$singleServiceTypeField} = $classType;
+        } elseif (!isset($this->{static::$singleServiceTypeField})) {
+            $this->{static::$singleServiceTypeField} = $modelClass::$singleServiceType;
+        }
     }
 
     public function newFromBuilder($attributes = array())
