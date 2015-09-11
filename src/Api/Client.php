@@ -12,6 +12,7 @@ class Client
 {
     protected $baseUrl = 'https://v2.api.phone.com';
     protected $headers = [];
+    protected $verifySsl = true;
 
     /**
      * @var \Closure
@@ -56,7 +57,8 @@ class Client
             ->setHeaders(@$config['headers'])
             ->setDebug(@$config['debug'])
             ->setListener(@$config['listener'])
-            ->setAuthBasic(@$config['username'], @$config['password']);
+            ->setAuthBasic(@$config['username'], @$config['password'])
+            ->setVerifySsl(@$config['verify_ssl']);
     }
 
     public function setHeaders($headers)
@@ -105,6 +107,15 @@ class Client
     {
         if ($baseUrl) {
             $this->baseUrl = $baseUrl;
+        }
+
+        return $this;
+    }
+
+    public function setVerifySsl($verifySsl)
+    {
+        if ($verifySsl !== null) {
+            $this->verifySsl = $verifySsl;
         }
 
         return $this;
@@ -232,7 +243,8 @@ class Client
         return new HttpClient([
             'handler' => $stack,
             'base_uri' => $this->baseUrl,
-            'headers' => $this->headers
+            'headers' => $this->headers,
+            'verify' => $this->verifySsl
         ]);
     }
 

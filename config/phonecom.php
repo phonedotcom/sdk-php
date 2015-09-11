@@ -25,6 +25,8 @@ return [
      */
     'debug' => env('PHONECOM_DEBUG', false),
 
+    'verify_ssl' => env('PHONECOM_VERIFY_SSL', true),
+
     'schema' => [
         /**
          * In JSON Schema documents, it is helpful to use the $ref property to point to other snippets of schema
