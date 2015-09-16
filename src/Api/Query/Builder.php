@@ -219,7 +219,7 @@ class Builder
     protected function compileWheres(array &$options)
     {
         if (!is_null($this->wheres)) {
-            $options['filter'] = [];
+            $options['filters'] = [];
 
             foreach ($this->wheres as $where) {
                 $string = $where['operator'];
@@ -229,7 +229,7 @@ class Builder
                     $string .= ':' . (is_scalar($value) ? $value : join(',', $value));
                 }
 
-                $options['filter'][$where['column']] = $string;
+                $options['filters'][$where['column']] = $string;
             }
         }
     }
