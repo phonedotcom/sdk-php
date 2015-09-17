@@ -66,8 +66,10 @@ class Builder
             return;
         }
 
+        $zeroParameterOperators = ['empty', 'not-empty'];
+
         if (func_num_args() == 2) {
-            if (!in_array($operator, ['empty', 'not-empty'])) {
+            if (!in_array($operator, $zeroParameterOperators)) {
                 $value = $operator;
                 $operator = 'eq';
             }
