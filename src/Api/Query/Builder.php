@@ -67,8 +67,10 @@ class Builder
         }
 
         if (func_num_args() == 2) {
-            $value = $operator;
-            $operator = 'eq';
+            if (!in_array($operator, ['empty', 'not-empty'])) {
+                $value = $operator;
+                $operator = 'eq';
+            }
 
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
@@ -77,6 +79,16 @@ class Builder
         $this->wheres[] = compact('column', 'operator', 'value');
 
         return $this;
+    }
+
+    public function whereEmpty($column)
+    {
+        return $this->where($column, 'empty');
+    }
+
+    public function whereNotEmpty($column)
+    {
+        return $this->where($column, 'not-empty');
     }
 
     public function whereIn($column, $values)
