@@ -20,6 +20,11 @@ class Client
     protected $listener;
 
     /**
+     * @var HttpClient;
+     */
+    protected $guzzle;
+
+    /**
      * List of responses to dole out each time Guzzle is asked to get something. Used only for testing.
      * @var array
      */
@@ -231,21 +236,25 @@ class Client
 
     private function getGuzzleClient()
     {
-        $stack = HandlerStack::create();
+        if ($this->guzzle === null) {
+            $stack = HandlerStack::create();
 
-        if (self::$mockResponses) {
-            $handler = new MockHandler(self::$mockResponses);
-            $stack->setHandler($handler);
+            if (self::$mockResponses) {
+                $handler = new MockHandler(self::$mockResponses);
+                $stack->setHandler($handler);
+            }
+
+            //$this->addHttpCaching($stack);
+
+            $this->guzzle = new HttpClient([
+                'handler' => $stack,
+                'base_uri' => $this->baseUrl,
+                'headers' => $this->headers,
+                'verify' => $this->verifySsl
+            ]);
         }
 
-        //$this->addHttpCaching($stack);
-
-        return new HttpClient([
-            'handler' => $stack,
-            'base_uri' => $this->baseUrl,
-            'headers' => $this->headers,
-            'verify' => $this->verifySsl
-        ]);
+        return $this->guzzle;
     }
 
     /* Commented out because we need a better way to let non-Laravel deployments use caching. If/When we
