@@ -241,7 +241,7 @@ class Builder
                     $string .= ':' . (is_scalar($value) ? $value : join(',', $value));
                 }
 
-                $options['filters'][$where['column']] = $string;
+                $options['filters'][$where['column']][] = $string;
             }
         }
     }
