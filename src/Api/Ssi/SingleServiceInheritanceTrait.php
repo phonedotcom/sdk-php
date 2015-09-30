@@ -15,7 +15,9 @@ trait SingleServiceInheritanceTrait
     {
         static::getSingleServiceTypeMap();
         static::getAllPersistedAttributes();
-        static::addGlobalScope(new SingleServiceInheritanceScope);
+        if (empty(static::$singleTableUnrestrictedKeys)) {
+            static::addGlobalScope(new SingleServiceInheritanceScope);
+        }
         static::observe(new SingleServiceInheritanceObserver());
     }
 
@@ -142,13 +144,13 @@ trait SingleServiceInheritanceTrait
         $classType = $attributes->$typeField;
         $childTypes = static::getSingleServiceTypeMap();
 
-        if (!array_key_exists($classType, $childTypes)) {
+        if (!array_key_exists($classType, $childTypes) && empty(self::$singleTableUnrestrictedKeys)) {
             throw new SingleServiceInheritanceException(
                 "Cannot construct newFromBuilder for unrecognized $typeField=$classType"
             );
         }
 
-        $class = $childTypes[$classType];
+        $class = (@$childTypes[$classType] ?: self::class);
         $instance = (new $class)->newInstance([], true);
         $instance->setFilteredAttributes((array) $attributes);
 
