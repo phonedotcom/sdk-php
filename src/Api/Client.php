@@ -5,6 +5,7 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use PhoneCom\Sdk\Api\Query\Builder as QueryBuilder;
 
@@ -30,6 +31,12 @@ class Client
      */
     private static $mockResponses;
 
+    /**
+     * List of transactions Guzzle has made. Used only when self::$mockResponses is used.
+     * @var array
+     */
+    private static $transactions = [];
+
     public static function setMockResponses(array $responses = [])
     {
         foreach ($responses as $response) {
@@ -48,6 +55,7 @@ class Client
     public static function flushMockResponses()
     {
         self::$mockResponses = null;
+        self::$transactions = [];
     }
 
     public function __construct(array $config = [])
@@ -240,6 +248,9 @@ class Client
             $stack = HandlerStack::create();
 
             if (self::$mockResponses) {
+                $history = Middleware::history(self::$transactions);
+                $stack->push($history);
+
                 $handler = new MockHandler(self::$mockResponses);
                 $stack->setHandler($handler);
             }
@@ -255,6 +266,11 @@ class Client
         }
 
         return $this->guzzle;
+    }
+
+    public static function getHistory()
+    {
+        return self::$transactions;
     }
 
     /* Commented out because we need a better way to let non-Laravel deployments use caching. If/When we
