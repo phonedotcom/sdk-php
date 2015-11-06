@@ -15,6 +15,8 @@ class Client
     protected $headers = [];
     protected $verifySsl = true;
 
+    private static $guzzleHandler;
+
     /**
      * @var \Closure
      */
@@ -216,7 +218,8 @@ class Client
                 } elseif ($e->getCode() == 422) {
                     $data = @json_decode($e->getResponse()->getBody()->__toString(), true);
 
-                    throw new ValidationException('', $data['@error']['fields']);
+                    $fields = @$data['@error']['fields'];
+                    throw new ValidationException('', ($fields ?: []));
                 }
             }
 
@@ -252,8 +255,12 @@ class Client
                 $stack->push($history);
 
                 $handler = new MockHandler(self::$mockResponses);
-                $stack->setHandler($handler);
+
+            } elseif (self::$guzzleHandler) {
+                $handler = self::$guzzleHandler;
             }
+
+            $stack->setHandler($handler);
 
             //$this->addHttpCaching($stack);
 
@@ -266,6 +273,11 @@ class Client
         }
 
         return $this->guzzle;
+    }
+
+    public static function setGuzzleHandler(callable $handler)
+    {
+        self::$guzzleHandler = $handler;
     }
 
     public static function getHistory()
