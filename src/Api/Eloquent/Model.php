@@ -983,31 +983,24 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function performUpdate(Builder $query, array $options = [])
     {
-        $dirty = $this->getDirty();
-
-        if (count($dirty) > 0) {
-            // If the updating event returns false, we will cancel the update operation so
-            // developers can hook Validation systems into their models and cancel this
-            // operation if the model does not pass validation. Otherwise, we update.
-            if ($this->fireModelEvent('updating') === false) {
-                return null;
-            }
-
-            // Once we have run the update operation, we will fire the "updated" event for
-            // this model instance. This will allow developers to hook into these after
-            // models are updated, giving them a chance to do any special processing.
-            $dirty = $this->getDirty();
-
-            if (count($dirty) > 0) {
-                if ($this->selfUrl) {
-                    self::$client->update($this->selfUrl, ['json' => $this->attributes]);
-                } else {
-                    $this->setKeysForSaveQuery($query)->update($dirty);
-                }
-
-                $this->fireModelEvent('updated', false);
-            }
+        // If the updating event returns false, we will cancel the update operation so
+        // developers can hook Validation systems into their models and cancel this
+        // operation if the model does not pass validation. Otherwise, we update.
+        if ($this->fireModelEvent('updating') === false) {
+            return null;
         }
+
+        $properties = $this->toArray();
+        if ($this->selfUrl) {
+            $object = self::$client->update($this->selfUrl, ['json' => $properties]);
+        } else {
+            $objects = $this->setKeysForSaveQuery($query)->update($properties);
+            $object = reset($objects);
+        }
+
+        $this->setRawAttributes((array)$object);
+
+        $this->fireModelEvent('updated', false);
 
         return $this;
     }
@@ -1032,7 +1025,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         } else {
             $data = $this->insert($attributes);
-            $this->fill((array)$data[0]);
+            $this->setRawAttributes((array)$data[0]);
 
             $result = $this;
         }

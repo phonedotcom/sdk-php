@@ -364,7 +364,8 @@ class Builder
     {
         $chunkSize = 50;
 
-        $this->chunk($chunkSize, function ($rows) use ($values) {
+        $objects = [];
+        $this->chunk($chunkSize, function ($rows) use ($values, &$objects) {
             foreach ($rows as $existing) {
                 $url = $existing->{'@controls'}->self->href;
 
@@ -373,11 +374,11 @@ class Builder
 
                 $options = ['json' => array_merge((array)$newValues, $values)];
 
-                $this->client->update($url, $options);
+                $objects[] = $this->client->update($url, $options);
             }
         });
 
-        return true;
+        return $objects;
     }
 
     public function delete($id = null)
