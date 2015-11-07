@@ -255,12 +255,11 @@ class Client
                 $stack->push($history);
 
                 $handler = new MockHandler(self::$mockResponses);
+                $stack->setHandler($handler);
 
             } elseif (self::$guzzleHandler) {
-                $handler = self::$guzzleHandler;
+                $stack->setHandler(self::$guzzleHandler);
             }
-
-            $stack->setHandler($handler);
 
             //$this->addHttpCaching($stack);
 
