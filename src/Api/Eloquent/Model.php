@@ -1,12 +1,12 @@
-<?php namespace PhoneCom\Sdk\Api\Eloquent;
+<?php namespace Phonedotcom\Sdk\Api\Eloquent;
 
 use DateTime;
 use ArrayAccess;
 use JsonSerializable;
 use Carbon\Carbon;
-use PhoneCom\Sdk\Api\Client;
-use PhoneCom\Sdk\Api\BadConfigurationException;
-use PhoneCom\Sdk\Api\Query\Builder as QueryBuilder;
+use Phonedotcom\Sdk\Api\Client;
+use Phonedotcom\Sdk\Api\BadConfigurationException;
+use Phonedotcom\Sdk\Api\Query\Builder as QueryBuilder;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -1223,7 +1223,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Create a new Eloquent query builder for the model.
      *
-     * @param  \PhoneCom\Sdk\Api\Query\Builder $query
+     * @param  \Phonedotcom\Sdk\Api\Query\Builder $query
      * @return Builder|static
      */
     public function newEloquentBuilder($query)
@@ -1234,7 +1234,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get a new query builder instance for the connection.
      *
-     * @return \PhoneCom\Sdk\Api\Query\Builder
+     * @return \Phonedotcom\Sdk\Api\Query\Builder
      */
     protected function newBaseQueryBuilder()
     {

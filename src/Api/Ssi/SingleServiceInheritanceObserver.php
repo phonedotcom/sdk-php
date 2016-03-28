@@ -1,6 +1,6 @@
 <?php
 
-namespace PhoneCom\Sdk\Api\Ssi;
+namespace Phonedotcom\Sdk\Api\Ssi;
 
 class SingleServiceInheritanceObserver
 {

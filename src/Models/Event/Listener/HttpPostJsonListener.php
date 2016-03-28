@@ -1,6 +1,6 @@
-<?php namespace PhoneCom\Sdk\Models\Event\Listener;
+<?php namespace Phonedotcom\Sdk\Models\Event\Listener;
 
-use PhoneCom\Sdk\Models\Event\Listener;
+use Phonedotcom\Sdk\Models\Event\Listener;
 
 class HttpPostJsonListener extends Listener
 {

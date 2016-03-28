@@ -1,4 +1,4 @@
-<?php namespace PhoneCom\Sdk\Api\Eloquent;
+<?php namespace Phonedotcom\Sdk\Api\Eloquent;
 
 class ModelNotFoundException extends \RuntimeException
 {

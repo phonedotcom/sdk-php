@@ -1,6 +1,6 @@
 <?php
 
-namespace PhoneCom\Sdk\Api\Ssi\Exceptions;
+namespace Phonedotcom\Sdk\Api\Ssi\Exceptions;
 
 class SingleServiceInheritanceException extends \Exception
 {

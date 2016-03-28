@@ -1,5 +1,5 @@
 <?php
-namespace PhoneCom\Sdk\Api;
+namespace Phonedotcom\Sdk\Api;
 
 class ValidationException extends \Exception
 {

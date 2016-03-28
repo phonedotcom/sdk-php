@@ -1,6 +1,6 @@
-<?php namespace PhoneCom\Sdk\Api\Query;
+<?php namespace Phonedotcom\Sdk\Api\Query;
 
-use PhoneCom\Sdk\Api\Client;
+use Phonedotcom\Sdk\Api\Client;
 
 class Builder
 {

@@ -1,12 +1,12 @@
-<?php namespace PhoneCom\Sdk\Models\Event\Log;
+<?php namespace Phonedotcom\Sdk\Models\Event\Log;
 
-use PhoneCom\Sdk\Models\Event\Log;
+use Phonedotcom\Sdk\Models\Event\Log;
 
 class ListenerFailureEntry extends Log
 {
     protected static $singleServiceType = 'listener.failure';
 
     protected $staticRelationMap = [
-        'listener' => 'PhoneCom\Sdk\Models\Event\Listener'
+        'listener' => 'Phonedotcom\Sdk\Models\Event\Listener'
     ];
 }

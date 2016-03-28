@@ -1,8 +1,8 @@
 <?php
-namespace PhoneCom\Mason\Tests;
+namespace Phonedotcom\Mason\Tests;
 
-use PhoneCom\Mason\Builder\Components\MasonNamespace;
-use PhoneCom\Mason\Builder\Document;
+use Phonedotcom\Mason\Builder\Components\MasonNamespace;
+use Phonedotcom\Mason\Builder\Document;
 
 class DocumentTest extends \PHPUnit_Framework_TestCase
 {

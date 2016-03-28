@@ -1,9 +1,9 @@
 <?php
 
-namespace PhoneCom\Sdk\Api\Ssi;
+namespace Phonedotcom\Sdk\Api\Ssi;
 
-use PhoneCom\Sdk\Api\Ssi\Exceptions\SingleServiceInheritanceException;
-use PhoneCom\Sdk\Api\Ssi\Exceptions\SingleServiceInheritanceInvalidAttributesException;
+use Phonedotcom\Sdk\Api\Ssi\Exceptions\SingleServiceInheritanceException;
+use Phonedotcom\Sdk\Api\Ssi\Exceptions\SingleServiceInheritanceInvalidAttributesException;
 
 trait SingleServiceInheritanceTrait
 {

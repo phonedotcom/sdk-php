@@ -1,4 +1,4 @@
-<?php namespace PhoneCom\Sdk\Api;
+<?php namespace Phonedotcom\Sdk\Api;
 
 use Closure;
 use GuzzleHttp\Client as HttpClient;
@@ -7,7 +7,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
-use PhoneCom\Sdk\Api\Query\Builder as QueryBuilder;
+use Phonedotcom\Sdk\Api\Query\Builder as QueryBuilder;
 
 class Client
 {

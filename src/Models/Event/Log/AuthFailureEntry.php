@@ -1,12 +1,12 @@
-<?php namespace PhoneCom\Sdk\Models\Event\Log;
+<?php namespace Phonedotcom\Sdk\Models\Event\Log;
 
-use PhoneCom\Sdk\Models\Event\Log;
+use Phonedotcom\Sdk\Models\Event\Log;
 
 class AuthFailureEntry extends Log
 {
     protected static $singleServiceType = 'auth.failure';
 
     protected $staticRelationMap = [
-        'application' => 'PhoneCom\Sdk\Models\Application'
+        'application' => 'Phonedotcom\Sdk\Models\Application'
     ];
 }

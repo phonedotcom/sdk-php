@@ -1,7 +1,7 @@
-<?php namespace PhoneCom\Sdk\Models\Event;
+<?php namespace Phonedotcom\Sdk\Models\Event;
 
-use PhoneCom\Sdk\Api\Eloquent\Model;
-use PhoneCom\Sdk\Api\Ssi\SingleServiceInheritanceTrait;
+use Phonedotcom\Sdk\Api\Eloquent\Model;
+use Phonedotcom\Sdk\Api\Ssi\SingleServiceInheritanceTrait;
 
 class Listener extends Model
 {
@@ -9,7 +9,7 @@ class Listener extends Model
 
     protected static $singleServiceTypeField = 'type';
     protected static $singleServiceSubclasses = [
-        'PhoneCom\Sdk\Models\Event\Listener\HttpPostJsonListener'
+        'Phonedotcom\Sdk\Models\Event\Listener\HttpPostJsonListener'
     ];
 
     protected $pathInfo = '/listeners';

@@ -1,10 +1,10 @@
 <?php
 
-namespace PhoneCom\Sdk\Api\Ssi;
+namespace Phonedotcom\Sdk\Api\Ssi;
 
-use PhoneCom\Sdk\Api\Eloquent\Builder;
-use PhoneCom\Sdk\Api\Eloquent\Model;
-use PhoneCom\Sdk\Api\Eloquent\ScopeInterface;
+use Phonedotcom\Sdk\Api\Eloquent\Builder;
+use Phonedotcom\Sdk\Api\Eloquent\Model;
+use Phonedotcom\Sdk\Api\Eloquent\ScopeInterface;
 
 class SingleServiceInheritanceScope implements ScopeInterface
 {

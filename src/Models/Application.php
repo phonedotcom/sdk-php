@@ -1,6 +1,6 @@
-<?php namespace PhoneCom\Sdk\Models;
+<?php namespace Phonedotcom\Sdk\Models;
 
-use PhoneCom\Sdk\Api\Eloquent\Model;
+use Phonedotcom\Sdk\Api\Eloquent\Model;
 
 class Application extends Model
 {

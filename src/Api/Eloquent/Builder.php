@@ -1,16 +1,16 @@
-<?php namespace PhoneCom\Sdk\Api\Eloquent;
+<?php namespace Phonedotcom\Sdk\Api\Eloquent;
 
-use PhoneCom\Sdk\Api\Query\Builder as QueryBuilder;
+use Phonedotcom\Sdk\Api\Query\Builder as QueryBuilder;
 
 class Builder
 {
     /**
-     * @var \PhoneCom\Sdk\Api\Query\Builder
+     * @var \Phonedotcom\Sdk\Api\Query\Builder
      */
     protected $query;
 
     /**
-     * @var \PhoneCom\Sdk\Api\Eloquent\Model
+     * @var \Phonedotcom\Sdk\Api\Eloquent\Model
      */
     protected $model;
 
@@ -27,7 +27,7 @@ class Builder
     }
 
     /**
-     * @return \PhoneCom\Sdk\Api\Model|array|null
+     * @return \Phonedotcom\Sdk\Api\Model|array|null
      */
     public function find($id)
     {
@@ -52,7 +52,7 @@ class Builder
     }
 
     /**
-     * @return \PhoneCom\Sdk\Api\Model|array
+     * @return \Phonedotcom\Sdk\Api\Model|array
      */
     public function findOrFail($id)
     {

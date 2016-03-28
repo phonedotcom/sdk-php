@@ -1,6 +1,6 @@
 <?php
 
-namespace PhoneCom\Sdk\Api\Eloquent;
+namespace Phonedotcom\Sdk\Api\Eloquent;
 
 interface ScopeInterface
 {
